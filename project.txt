@@ -1,0 +1,102 @@
+import { useState } from "react";
+import { motion } from "framer-motion";
+
+export default function GamifiedPlanner() {
+  const [tasks, setTasks] = useState([]);
+  const [coins, setCoins] = useState(0);
+  const [xp, setXp] = useState(0);
+
+  const addTask = (task) => {
+    setTasks([...tasks, { text: task, done: false }]);
+  };
+
+  const completeTask = (index) => {
+    let newTasks = [...tasks];
+    newTasks[index].done = true;
+    setTasks(newTasks);
+    setCoins(coins + 10);
+    setXp(xp + 20);
+  };
+
+  const avatarStage = xp < 100 ? "🥚 Egg" : xp < 200 ? "🐣 Baby" : "🐉 Dragon";
+
+  return (
+    <div className="min-h-screen bg-gradient-to-r from-indigo-400 to-purple-500 p-6 text-white">
+      <h1 className="text-3xl font-bold mb-4">🎮 Gamified Daily Planner</h1>
+
+      {/* Avatar */}
+      <div className="mb-6 text-center">
+        <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1 }}>
+          <p className="text-6xl">{avatarStage.split(" ")[0]}</p>
+        </motion.div>
+        <p className="mt-2 text-lg">Stage: {avatarStage}</p>
+        <p>⭐ XP: {xp} | 💰 Coins: {coins}</p>
+      </div>
+
+      {/* Add Task */}
+      <TaskInput onAdd={addTask} />
+
+      {/* Task List */}
+      <ul className="mt-4 space-y-2">
+        {tasks.map((task, i) => (
+          <li
+            key={i}
+            className={`flex justify-between items-center p-3 rounded-xl ${
+              task.done ? "bg-green-500" : "bg-white/20"
+            }`}
+          >
+            <span>{task.text}</span>
+            {!task.done && (
+              <button
+                onClick={() => completeTask(i)}
+                className="bg-yellow-400 text-black px-3 py-1 rounded-lg"
+              >
+                ✅ Complete
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+
+      {/* Leaderboard (Mock) */}
+      <div className="mt-8 bg-white/20 p-4 rounded-xl">
+        <h2 className="text-xl font-bold mb-2">🏆 Leaderboard</h2>
+        <ol className="list-decimal ml-6">
+          <li>You – {coins} coins</li>
+          <li>Alice – 120 coins</li>
+          <li>Bob – 90 coins</li>
+        </ol>
+      </div>
+    </div>
+  );
+}
+
+// Task Input Component
+function TaskInput({ onAdd }) {
+  const [input, setInput] = useState("");
+
+  const handleAdd = () => {
+    if (input.trim()) {
+      onAdd(input);
+      setInput("");
+    }
+  };
+
+  return (
+    <div className="flex gap-2">
+      <input
+        type="text"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        placeholder="Enter your mission..."
+        className="flex-1 px-3 py-2 rounded-lg text-black"
+      />
+      <button
+        onClick={handleAdd}
+        className="bg-green-400 px-4 py-2 rounded-lg text-black font-bold"
+      >
+        ➕ Add
+      </button>
+    </div>
+  );
+}
